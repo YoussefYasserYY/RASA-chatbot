@@ -1,0 +1,23 @@
+version: "3.1"
+
+rules:
+
+- rule: Say goodbye anytime the user says goodbye
+  steps:
+  - intent: goodbye
+  - action: utter_goodbye
+
+- rule: Greet anytime the user says hi 
+  steps:
+  - intent: greet
+  - action: utter_greet
+
+- rule: Utter location when user asks for location
+  steps:
+  - intent: location
+  - action: utter_location
+
+- rule: Utter timings when user asks for timings
+  steps:
+  - intent: timings
+  - action: utter_timings

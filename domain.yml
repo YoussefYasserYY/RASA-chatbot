@@ -1,0 +1,31 @@
+version: "3.1"
+
+config:
+  store_entities_as_slots: true
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: true
+intents:
+- greet:
+    use_entities: true
+- goodbye:
+    use_entities: true
+- location:
+    use_entities: true
+- timings:
+    use_entities: true
+entities:
+- LOC
+slots: {}
+responses:
+  utter_greet:
+  - text: كيف حالك اليوم؟ .DScale.io يا هذا هو
+  utter_goodbye:
+  - text: وداعا أتمنى لك يوما سعيدا
+  utter_location:
+  - text: يمكنك أن تجدنا في إعمار سكوير دبي
+  utter_timings:
+  - text: نحن منفتحون من الأحد إلى الخميس ، من الساعة 9:00 إلى الساعة 6:00 مساءً
+actions: []
+forms: {}
+e2e_actions: []

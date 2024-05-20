@@ -1,0 +1,82 @@
+# version: "3.1"
+
+# stories:
+# - story: greet and goodbye
+#   steps:
+#   - intent: greet
+#   - action: utter_greet
+#   - intent: goodbye
+#   - action: utter_goodbye
+
+# - story: ask for help
+#   steps:
+#   - intent: greet
+#   - action: utter_greet
+#   - intent: ask_for_help
+#   - action: utter_explain_help
+#   - intent: goodbye
+#   - action: utter_goodbye
+
+# - story: ask for weather
+#   steps:
+#   - intent: greet
+#   - action: utter_greet
+#   - intent: ask_weather
+#   - action: weather_api_action
+#   - action: utter_thanks
+#   - intent: goodbye
+#   - action: utter_goodbye
+
+# - story: thank
+#   steps:
+#   - intent: greet
+#   - action: utter_greet
+#   - intent: thank
+#   - action: utter_you_are_welcome
+#   - intent: goodbye
+#   - action: utter_goodbye
+
+# - story: inquire time
+#   steps:
+#   - intent: greet
+#   - action: utter_greet
+#   - intent: inquire_time
+#   - action: action_inquire_time
+#   - intent: goodbye
+#   - action: utter_goodbye
+
+# - story: inquire date
+#   steps:
+#   - intent: greet
+#   - action: utter_greet
+#   - intent: inquire_date
+#   - action: action_inquire_date
+#   - intent: goodbye
+#   - action: utter_goodbye
+
+# - story: joke
+#   steps:
+#   - intent: greet
+#   - action: utter_greet
+#   - intent: joke
+#   - action: action_tell_joke
+#   - intent: goodbye
+#   - action: utter_goodbye
+
+# - story: express love
+#   steps:
+#   - intent: greet
+#   - action: utter_greet
+#   - intent: express_love
+#   - action: utter_love_response
+#   - intent: goodbye
+#   - action: utter_goodbye
+
+# - story: express hate
+#   steps:
+#   - intent: greet
+#   - action: utter_greet
+#   - intent: express_hate
+#   - action: utter_hate_response
+#   - intent: goodbye
+#   - action: utter_goodbye

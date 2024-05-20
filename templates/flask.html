@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatroom</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container mt-5">
+        <div class="card w-50 mx-auto">
+            <div class="card-body chat-container" id="chat-container">
+                <div class="message bot-message text-primary mb-3">
+                    <strong>مرحباً! كيف يمكنني مساعدتك اليوم؟</strong>
+                </div>
+            </div>
+            <div class="input-group justify-content-end">
+                <input type="text" class="form-control" id="user-input" placeholder="Type your message...">
+                <div class="input-group-append">
+                    <button class="btn btn-primary" id="send-button">Send</button>
+                    <div class="holder">
+                        <div data-role="controls">
+                            <button class="btn btn-primary">Record</button>
+                        </div>
+                        <div data-role="recordings"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Bootstrap JS (optional, for certain features like dropdowns) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        var chatContainer; // Declare chatContainer as a global variable
+
+        $(document).ready(function () {
+            chatContainer = $('#chat-container'); // Assign chatContainer inside document ready
+
+            // Function to send message
+            function sendMessage() {
+                var userInput = $('#user-input').val();
+
+                var userMessage = $('<div class="message user-message text-success text-right"><strong class="mt-2 mb-2">You: ' + userInput + '</strong></div>');
+                chatContainer.append(userMessage);
+
+                $('#user-input').val('');
+
+                // Show loading dots
+                <!-- var loadingDots = $('<div class="message bot-message loading-dots"></div>'); -->
+                < !--chatContainer.append(loadingDots); -->
+
+                    $.ajax({
+                        url: "/send_message",
+                        type: "POST",
+                        contentType: "application/x-www-form-urlencoded",
+                        data: { message: userInput },
+                        success: function (data) {
+                        // Remove loading dots
+                        < !--loadingDots.remove(); -->
+
+                        // Play the audio
+                        var audio = new Audio(data.audio_url);
+                            audio.play();
+
+                            // Display the bot message if needed
+                            var botMessage = $('<div class="message bot-message text-primary"><strong class="mb-0">Bot: ' + data.message + '</strong></div>');
+                            chatContainer.append(botMessage);
+                        },
+                        error: function (xhr, textStatus, errorThrown) {
+                            console.error("Error sending message:", errorThrown);
+                        }
+                    });
+
+            }
+
+            // Send message when Enter key is pressed
+            $('#user-input').keypress(function (e) {
+                if (e.which == 13) {
+                    sendMessage();
+                }
+            });
+
+            // Send message when Send button is clicked
+            $('#send-button').click(function () {
+                sendMessage();
+            });
+        });
+    </script>
+
+
+
+
+
+    <script src="https://markjivko.com/dist/recorder.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://markjivko.com/dist/recorder.js"></script>
+    <script>
+        jQuery(document).ready(function () {
+            var $ = jQuery;
+            var myRecorder = {
+                objects: {
+                    context: null,
+                    stream: null,
+                    recorder: null
+                },
+                init: function () {
+                    if (null === myRecorder.objects.context) {
+                        myRecorder.objects.context = new (window.AudioContext || window.webkitAudioContext)();
+                    }
+                },
+                start: function () {
+                    var options = { audio: true, video: false };
+                    navigator.mediaDevices
+                        .getUserMedia(options)
+                        .then(function (stream) {
+                            myRecorder.objects.stream = stream;
+                            myRecorder.objects.recorder = new Recorder(
+                                myRecorder.objects.context.createMediaStreamSource(stream),
+                                { numChannels: 1 }
+                            );
+                            myRecorder.objects.recorder.record();
+                        })
+                        .catch(function (err) { });
+                },
+                stop: function (listObject) {
+                    if (null !== myRecorder.objects.stream) {
+                        myRecorder.objects.stream.getAudioTracks()[0].stop();
+                    }
+                    if (null !== myRecorder.objects.recorder) {
+                        myRecorder.objects.recorder.stop();
+
+                        // Validate object
+                        if (null !== listObject && "object" === typeof listObject && listObject.length > 0) {
+                            // Export the WAV file
+                            myRecorder.objects.recorder.exportWAV(function (blob) {
+                                var formData = new FormData();
+                                formData.append('audio', blob, 'recording.wav');
+
+                                // Send the recorded audio to Flask backend
+                                $.ajax({
+                                    url: '/upload-audio',
+                                    type: 'POST',
+                                    data: formData,
+                                    contentType: false,
+                                    processData: false,
+                                    success: function (response) {
+                                        console.log(response.message);
+                                        var botMessage = $('<div class="message user-message text-success text-right"><strong class="mt-2 mb-2">You: ' + response.message + '</strong></div>');
+                                        chatContainer.append(botMessage);
+                                        $.ajax({
+                                            url: "/send_message",
+                                            type: "POST",
+                                            contentType: "application/x-www-form-urlencoded",
+                                            data: { 'message': response.message },
+                                            success: function (data) {
+                                                // Remove loading dots
+
+                                                var botMessage = $('<div class="message bot-message text-primary"><strong class="mb-0">Bot: ' + data.message + '</strong></div>');
+                                                chatContainer.append(botMessage);
+                                                var audio = new Audio(data.audio_url);
+                                                audio.play();
+                                            },
+                                            error: function (xhr, textStatus, errorThrown) {
+                                                console.error("Error sending message:", errorThrown);
+                                            }
+                                        });
+                                        // Handle success response if needed
+                                    },
+                                    error: function (xhr, status, error) {
+                                        console.error('Error uploading audio:', error);
+                                        // Handle error response if needed
+                                    }
+                                });
+                            });
+                        }
+                    }
+                }
+            };
+
+            // Prepare the recordings list
+            var listObject = $('[data-role="recordings"]');
+
+            // Prepare the record button
+            $('[data-role="controls"] > button').click(function () {
+                // Initialize the recorder
+                myRecorder.init();
+
+                // Get the button state
+                var buttonState = !!$(this).attr("data-recording");
+
+                // Toggle
+                if (!buttonState) {
+                    $(this).attr("data-recording", "true");
+                    myRecorder.start();
+                } else {
+                    $(this).attr("data-recording", "");
+                    myRecorder.stop(listObject);
+                }
+            });
+        });
+    </script>
+
+</body>
+
+</html>
