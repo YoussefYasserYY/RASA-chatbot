@@ -4,15 +4,29 @@ import speech_recognition as sr
 from gtts import gTTS
 
 
+"""
+This is a Flask application that interacts with a Rasa chatbot through HTTP requests.
+"""
+
 # Initialize the recognizer
 app = Flask(__name__)
 
 recognizer = sr.Recognizer()
 # Rasa endpoint URL
-rasa_url = "http://localhost:5005"
+RASA_URL = "http://localhost:5005"
+
 
 def send_to_rasa(text):
-    endpoint = f"{rasa_url}/webhooks/rest/webhook"
+    """
+    Send a message to Rasa server and get the response.
+
+    Args:
+        text (str): The message to send to Rasa.
+
+    Returns:
+        str: The response from Rasa.
+    """
+    endpoint = f"{RASA_URL}/webhooks/rest/webhook"
     data = {"sender": "user", "message": text}
 
     try:
@@ -31,45 +45,50 @@ def send_to_rasa(text):
 
 @app.route("/")
 def index():
+    """
+    Render the index page.
+    """
     return render_template("flask.html")
 
 @app.route("/send_message", methods=["POST"])
 def send_message():
+    """
+    Handle sending message to Rasa server and returning the response.
+    """
     message = request.form["message"]
     rasa_response = send_to_rasa(message)
-        
-    tts = gTTS(text = rasa_response,lang = "ar")
+    tts = gTTS(text=rasa_response, lang="ar")
     tts.save('Rasa_answer/answer.mp3')
-    # return jsonify({"message": rasa_response})
-        # Return the URL of the MP3 file
-    return jsonify({"audio_url": "/stream_audio","message": rasa_response})
+    return jsonify({"audio_url": "/stream_audio", "message": rasa_response})
 
 @app.route("/stream_audio")
 def stream_audio():
+    """
+    Stream the saved audio file.
+    """
     return send_file('Rasa_answer/answer.mp3', mimetype='audio/mpeg')
-
 
 @app.route('/upload-audio', methods=['POST'])
 def upload_audio():
-    # Check if the POST request has the file part
+    """
+    Handle uploading audio file, transcribing it, and returning the transcript.
+    """
     if 'audio' not in request.files:
         return jsonify({'error': 'No audio file part'})
-    
+
     audio_file = request.files['audio']
-    
-    # Check if the file is empty
+
     if audio_file.filename == '':
         return jsonify({'error': 'No selected audio file'})
 
     audio_file.save('uploads/recording.wav')
-    
+
     with sr.AudioFile('uploads/recording.wav') as source:
         audio = recognizer.listen(source)
-        # Recognize the speech with the chosen language
         rasa_response = recognizer.recognize_google(audio, language="ar-EG")
 
-    # Return a success response
     return jsonify({'message': rasa_response})
+
 
 if __name__ == "__main__":
     app.run(debug=True,host = '0.0.0.0')
