@@ -3,16 +3,13 @@ import requests
 import speech_recognition as sr
 from gtts import gTTS
 
-
 """
 This is a Flask application that interacts with a Rasa chatbot through HTTP requests.
 """
 
-# Initialize the recognizer
 app = Flask(__name__)
 
 recognizer = sr.Recognizer()
-# Rasa endpoint URL
 RASA_URL = "http://localhost:5005"
 
 
@@ -91,4 +88,4 @@ def upload_audio():
 
 
 if __name__ == "__main__":
-    app.run(debug=True,host = '0.0.0.0')
+    app.run(debug=True, host='0.0.0.0')
