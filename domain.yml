@@ -19,13 +19,13 @@ entities:
 slots: {}
 responses:
   utter_greet:
-  - text: كيف حالك اليوم؟ .DScale.io يا هذا هو
+  - text: إيه أخبارك
   utter_goodbye:
-  - text: وداعا أتمنى لك يوما سعيدا
+  - text: مع السلامه هتوحشنا
   utter_location:
-  - text: يمكنك أن تجدنا في إعمار سكوير دبي
+  - text: هتلاقيني في كل مكان يا صاحبي
   utter_timings:
-  - text: نحن منفتحون من الأحد إلى الخميس ، من الساعة 9:00 إلى الساعة 6:00 مساءً
+  - text: فاتحين أربعه وعشرين ساعه يا باشا
 actions: []
 forms: {}
 e2e_actions: []
