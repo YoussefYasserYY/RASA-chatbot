@@ -39,8 +39,8 @@ def text_to_speech_file(text: str) -> str:
         text=text,
         model_id="eleven_multilingual_v2", # use the turbo model for low latency, for other languages use the `eleven_multilingual_v2`
         voice_settings=VoiceSettings(
-            stability=0.0,
-            similarity_boost=1.0,
+            stability=0.4,
+            similarity_boost=0.5,
             style=0.0,
             use_speaker_boost=True,
         ),
