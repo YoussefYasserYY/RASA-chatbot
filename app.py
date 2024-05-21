@@ -1,8 +1,9 @@
 from flask import Flask, request, jsonify, render_template, send_file
 import requests
 import speech_recognition as sr
-from gtts import gTTS
-
+import os
+from elevenlabs import VoiceSettings
+from elevenlabs.client import ElevenLabs
 """
 This is a Flask application that interacts with a Rasa chatbot through HTTP requests.
 """
@@ -14,14 +15,6 @@ RASA_URL = "http://localhost:5005"
 
 
 
-
-
-
-
-import os
-import uuid
-from elevenlabs import VoiceSettings
-from elevenlabs.client import ElevenLabs
 
 ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY")
 client = ElevenLabs(
@@ -45,9 +38,6 @@ def text_to_speech_file(text: str) -> str:
             use_speaker_boost=True,
         ),
     )
-
-    # uncomment the line below to play the audio back
-    # play(response)
 
     # Generating a unique file name for the output MP3 file
     save_file_path = "Rasa_answer/answer.mp3"
@@ -108,12 +98,13 @@ def send_message():
     Handle sending message to Rasa server and returning the response.
     """
     message = request.form["message"]
-    rasa_response = send_to_rasa(message)
-    text_to_speech_file(rasa_response)
+    if message=='':
+        text_to_speech_file('معلش لم اسمعك')
+        rasa_response ='معلش لم اسمعك'
+    else:
+        rasa_response = send_to_rasa(message)
+        text_to_speech_file(rasa_response)
 
-    
-    # tts = gTTS(text=rasa_response, lang="ar")
-    # tts.save('Rasa_answer/answer.mp3')
     return jsonify({"audio_url": "/stream_audio", "message": rasa_response})
 
 @app.route("/stream_audio")
@@ -138,12 +129,15 @@ def upload_audio():
 
     audio_file.save('uploads/recording.wav')
 
-    with sr.AudioFile('uploads/recording.wav') as source:
-        audio = recognizer.listen(source)
-        rasa_response = recognizer.recognize_google(audio, language="ar-EG")
+    try:
+        with sr.AudioFile('uploads/recording.wav') as source:
+            audio = recognizer.listen(source)
+            rasa_response = recognizer.recognize_google(audio, language="ar-EG")
 
+    except:
+        return jsonify({'message': ''})
+    
     return jsonify({'message': rasa_response})
-
 
 if __name__ == "__main__":
     app.run(debug=True,host = '0.0.0.0')
